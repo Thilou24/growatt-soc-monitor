@@ -10,18 +10,16 @@ async function extractSOC() {
     console.log('[PLAYWRIGHT] Navigating to login...');
     await page.goto('https://server.growatt.com/login', { waitUntil: 'networkidle' });
     
-    console.log('[PLAYWRIGHT] Filling credentials...');
-    await page.fill('input[type="text"]', 'Thilou24', { timeout: 10000 });
-    await page.fill('input[type="password"]', 'LaNatEst1TempleShi', { timeout: 10000 });
-    
-    console.log('[PLAYWRIGHT] Waiting for login button...');
-    await page.waitForSelector('button', { timeout: 10000 });
-    
-    console.log('[PLAYWRIGHT] Clicking login...');
-    const buttons = await page.$$('button');
-    if (buttons.length > 0) {
-      await buttons[0].click({ timeout: 10000 });
+    console.log('[PLAYWRIGHT] Filling User Name...');
+    const inputs = await page.$$('input');
+    if (inputs.length >= 2) {
+      await inputs[0].fill('Thilou24');
+      console.log('[PLAYWRIGHT] Filling Password...');
+      await inputs[1].fill('LaNatEst1TempleShi');
     }
+    
+    console.log('[PLAYWRIGHT] Clicking Login button...');
+    await page.click('button:has-text("Login")');
     
     console.log('[PLAYWRIGHT] Waiting for dashboard...');
     await page.waitForNavigation({ waitUntil: 'networkidle', timeout: 20000 });
