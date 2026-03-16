@@ -25,7 +25,8 @@ async function extractSOC() {
     console.log('[PLAYWRIGHT] Extracting SOC...');
     const soc = await page.evaluate(() => {
       const text = document.body.innerText;
-      const match = text.match(/(\d{1,3})\s*%/);
+      // Chercher "SoC: XX%" spécifiquement
+      const match = text.match(/SoC[:\s]+(\d{1,3})\s*%/i);
       return match ? match[1] : null;
     });
     
@@ -33,9 +34,13 @@ async function extractSOC() {
     
     if (soc && process.env.HOSTINGER_WEBHOOK_URL) {
       console.log('[PLAYWRIGHT] Sending to Hostinger...');
-      const url = process.env.HOSTINGER_WEBHOOK_URL + '&soc=' + soc + '&timestamp=' + new Date().toISOString();
-      const response = await page.goto(url);
-      console.log('[PLAYWRIGHT] Response: ' + response.status());
+      try {
+        const url = process.env.HOSTINGER_WEBHOOK_URL + '&soc=' + soc + '&timestamp=' + new Date().toISOString();
+        const response = await page.goto(url, { waitUntil: 'networkidle', timeout: 10000 });
+        console.log('[PLAYWRIGHT] Response: ' + response.status());
+      } catch (err) {
+        console.log('[PLAYWRIGHT] Send error (may be firewall): ' + err.message);
+      }
     }
     
   } catch (error) {
