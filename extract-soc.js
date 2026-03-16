@@ -11,11 +11,17 @@ async function extractSOC() {
     await page.goto('https://server.growatt.com/login', { waitUntil: 'networkidle' });
     
     console.log('[PLAYWRIGHT] Filling credentials...');
-    await page.fill('input[type="text"]', 'Thilou24');
-    await page.fill('input[type="password"]', 'LaNatEst1TempleShi');
+    await page.fill('input[type="text"]', 'Thilou24', { timeout: 10000 });
+    await page.fill('input[type="password"]', 'LaNatEst1TempleShi', { timeout: 10000 });
+    
+    console.log('[PLAYWRIGHT] Waiting for login button...');
+    await page.waitForSelector('button', { timeout: 10000 });
     
     console.log('[PLAYWRIGHT] Clicking login...');
-    await page.click('button[type="submit"]');
+    const buttons = await page.$$('button');
+    if (buttons.length > 0) {
+      await buttons[0].click({ timeout: 10000 });
+    }
     
     console.log('[PLAYWRIGHT] Waiting for dashboard...');
     await page.waitForNavigation({ waitUntil: 'networkidle', timeout: 20000 });
@@ -29,7 +35,7 @@ async function extractSOC() {
     
     console.log('[PLAYWRIGHT] ✅ SOC FOUND: ' + soc + '%');
     
-    if (soc) {
+    if (soc && process.env.HOSTINGER_WEBHOOK_URL) {
       console.log('[PLAYWRIGHT] Sending to Hostinger...');
       const url = process.env.HOSTINGER_WEBHOOK_URL + '&soc=' + soc + '&timestamp=' + new Date().toISOString();
       const response = await page.goto(url);
