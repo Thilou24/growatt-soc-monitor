@@ -1,0 +1,12 @@
+{
+  "name": "growatt-soc-monitor",
+  "version": "1.0.0",
+  "description": "Extract Growatt SOC hourly with Playwright",
+  "main": "extract-soc.js",
+  "scripts": {
+    "start": "node extract-soc.js"
+  },
+  "dependencies": {
+    "playwright": "1.40.1"
+  }
+}
